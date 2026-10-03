@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<link rel="stylesheet" href="index.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Единый реестр МВД РФ</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0 0 60px;
+    background: #eef1f5;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+button,
+input,
+select {
+    font-family: Arial, sans-serif;
+}
+
+button {
+    cursor: pointer;
+}
+
+header {
+    background: #0b2447;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    border-top: 4px solid #da251d;
+}
+
+header h2 {
+    margin: 0;
+    font-size: 15px;
+    text-transform: uppercase;
+}
+
+header p {
+    margin: 4px 0 0;
+    color: #cbd5e1;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.container {
+    width: 100%;
+    max-width: 680px;
+    margin: 15px auto;
+    padding: 0 10px;
+}
+
+#loginPage {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #e8ecf1;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 390px;
+    background: white;
+    padding: 28px;
+    border: 1px solid #c8cdd3;
+    border-top: 5px solid #0b2447;
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.login-logo h2 {
+    margin: 0;
+    color: #0b2447;
+    font-size: 17px;
+}
+
+.login-logo p {
+    margin: 6px 0 0;
+    color: #777;
+    font-size: 10px;
+}
+
+.login-error {
+    display: none;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    padding: 9px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    border: 1px solid #c9ced4;
+    background: white;
+    padding: 10px;
+    margin-bottom: 9px;
+    font-size: 13px;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+button {
+    width: 100%;
+    border: none;
+    padding: 11px;
+    background: #0b2447;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+button:hover {
+    opacity: .92;
+}
+
+.btn-blue {
+    background: #2563eb;
+}
+
+.btn-green {
+    background: #166534;
+}
+
+.btn-red {
+    background: #991b1b;
+}
+
+.btn-gray {
+    background: #475569;
+}
+
+.btn-purple {
+    background: #7c3aed;
+}
+
+.user-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+}
+
+.user-info {
+    font-size: 11px;
+    line-height: 18px;
+}
+
+.user-info strong {
+    color: #0b2447;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 3px 7px;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.logout-btn {
+    width: auto;
+    padding: 7px 10px;
+    background: #991b1b;
+}
+
+.mvd-box {
+    background: white;
+    border: 1px solid #ccc;
+    border-top: 3px solid #0b2447;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.mvd-box h4 {
+    margin: 0 0 11px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    color: #0b2447;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.notice {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+    padding: 9px;
+    margin-bottom: 10px;
+    font-size: 10px;
+}
+
+.archive-title {
+    color: #555;
+    font-size: 12px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin: 20px 0 10px;
+}
+
+.card {
+    background: white;
+    border: 1px solid #c8cdd3;
+    border-left: 7px solid #0b2447;
+    margin-bottom: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,.04);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 17px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.card-header-title {
+    color: #0b2447;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.card-number {
+    color: #999;
+    font-size: 9px;
+}
+
+.card-row {
+    display: flex;
+    align-items: baseline;
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.card-row b {
+    width: 190px;
+    flex-shrink: 0;
+    color: #444;
+}
+
+.card-row-value {
+    color: #555;
+    word-break: break-word;
+}
+
+.username-value {
+    color: #0b2447;
+    font-weight: bold;
+}
+
+.display-value {
+    color: #111827;
+    font-weight: bold;
+}
+
+.status {
+    display: inline-block;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-wanted {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-investigation {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e1e5e9;
+}
+
+.card-actions button {
+    width: auto;
+    padding: 10px 18px;
+    font-size: 10px;
+}
+
+.empty {
+    text-align: center;
+    padding: 25px;
+    color: #999;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.58);
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-top: 5px solid #0b2447;
+    box-shadow: 0 15px 50px rgba(0,0,0,.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 18px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #0b2447;
+    font-size: 15px;
+    text-transform: uppercase;
+}
+
+.modal-close {
+    width: auto;
+    padding: 4px 10px;
+    background: #991b1b;
+    font-size: 15px;
+}
+
+.modal-body {
+    padding: 18px;
+}
+
+.form-label {
+    display: block;
+    margin: 3px 0 5px;
+    color: #555;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 8px;
+    padding: 13px 18px;
+    border-top: 1px solid #ddd;
+    background: #f8fafc;
+}
+
+.modal-footer button {
+    flex: 1;
+}
+
+.loading {
+    text-align: center;
+    padding: 25px;
+    color: #777;
+    font-size: 11px;
+}
+
+@media (max-width: 520px) {
+
+    .container {
+        padding: 0 8px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .card-row {
+        display: block;
+        margin: 13px 0;
+        font-size: 14px;
+    }
+
+    .card-row b {
+        display: block;
+        width: auto;
+        margin-bottom: 3px;
+    }
+
+    .card-actions {
+        flex-direction: column;
+    }
+
+    .card-actions button {
+        width: 100%;
+    }
+
+    .user-bar {
+        align-items: flex-start;
+    }
+
+    .logout-btn {
+        margin-left: 10px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="loginPage">
+
+    <div class="login-box">
+
+        <div class="login-logo">
+
+            <h2>
+                МИНИСТЕРСТВО ВНУТРЕННИХ ДЕЛ РФ
+            </h2>
+
+            <p>
+                Центральная система доступа к реестру
+            </p>
+
+        </div>
+
+        <div id="loginError" class="login-error">
+            Неверный логин или пароль.
+        </div>
+
+        <input
+            type="text"
+            id="loginUsername"
+            placeholder="Служебный логин"
+        >
+
+        <input
+            type="password"
+            id="loginPassword"
+            placeholder="Служебный пароль"
+        >
+
+        <button onclick="login()">
+            Войти в систему
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="app" style="display:none;">
+
+   <header>
+
+    <div class="mvd-header">
+
+        <img
+            src="gerb-mvd.png"
+            alt="Герб МВД"
+            class="mvd-gerb"
+        >
+
+        <div class="mvd-title">
+
+            <h2>
+                МИНИСТЕРСТВО<br>
+                ВНУТРЕННИХ ДЕЛ<br>
+                <span>по ЛО г. Зареченск</span>
+            </h2>
+
+            <p>
+                Единый реестр МВД
+            </p>
+
+        </div>
+
+    </div>
+
+</header>
+
+<div class="mvd-navigation">
+
+    <div class="mvd-navigation-inner">
+
+        <div class="mvd-menu">
+            ☰
+        </div>
+
+        <div class="mvd-search">
+            🔍
+        </div>
+
+    </div>
+
+</div>
+
+    <div class="container">
+
+        <div class="user-bar">
+
+            <div class="user-info">
+
+                Вы вошли как:
+
+                <strong id="currentUsername"></strong>
+
+                <br>
+
+                <span
+                    class="role-badge"
+                    id="currentRole"
+                ></span>
+
+            </div>
+
+            <button
+                class="logout-btn"
+                onclick="logout()"
+            >
+                Выйти
+            </button>
+
+        </div>
+
+
+        <div class="mvd-box">
+
+            <h4>
+                Поиск по реестру
+            </h4>
+
+            <input
+                type="text"
+                id="searchQuery"
+                placeholder="Username, Display Name, ФИО, паспорт..."
+                oninput="executeSearch()"
+            >
+
+            <select
+                id="statusFilter"
+                onchange="executeSearch()"
+            >
+
+                <option value="">
+                    Все статусы
+                </option>
+
+                <option value="Активный">
+                    Активный
+                </option>
+
+                <option value="В розыске">
+                    В розыске
+                </option>
+
+                <option value="Под следствием">
+                    Под следствием
+                </option>
+
+            </select>
+
+            <button onclick="executeSearch()">
+                Выполнить поиск
+            </button>
+
+        </div>
+
+
+        <div
+            class="mvd-box"
+            id="addRecordBox"
+        >
+
+            <h4>
+                Внести новое лицо в архив
+            </h4>
+
+            <input
+                type="text"
+                id="newNick"
+                placeholder="Roblox Username"
+            >
+
+            <input
+                type="text"
+                id="newName"
+                placeholder="Display Name"
+            >
+
+            <input
+                type="text"
+                id="newRp"
+                placeholder="РП ФИО гражданина"
+            >
+
+            <input
+                type="text"
+                id="newPassport"
+                placeholder="Серия и номер паспорта"
+            >
+
+            <input
+                type="text"
+                id="newLoc"
+                placeholder="Место проживания"
+            >
+
+            <select id="newStatus">
+
+                <option value="Активный">
+                    Активный
+                </option>
+
+                <option value="В розыске">
+                    В розыске
+                </option>
+
+                <option value="Под следствием">
+                    Под следствием
+                </option>
+
+            </select>
+
+            <button
+                class="btn-green"
+                onclick="addRecord()"
+            >
+                Внести карточку в архив
+            </button>
+
+        </div>
+
+
+        <div
+            class="mvd-box hidden"
+            id="accountsBox"
+            style="border-top-color:#7c3aed;"
+        >
+
+            <h4>
+                Управление аккаунтами
+            </h4>
+
+            <div class="notice">
+
+                Управление аккаунтами через Supabase Auth
+                требует серверной функции. Этот раздел
+                будет подключён отдельно.
+
+            </div>
+
+        </div>
+
+
+        <h3 class="archive-title">
+            Архивные дела реестра
+        </h3>
+
+        <div id="cardsBox"></div>
+
+    </div>
+
+</div>
+
+
+<div
+    class="modal-overlay"
+    id="editModal"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h3>
+                Редактирование досье
+            </h3>
+
+            <button
+                class="modal-close"
+                onclick="closeEditModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <label class="form-label">
+                Roblox Username
+            </label>
+
+            <input
+                type="text"
+                id="editNick"
+                placeholder="Roblox Username"
+            >
+
+            <label class="form-label">
+                Display Name
+            </label>
+
+            <input
+                type="text"
+                id="editName"
+                placeholder="Display Name"
+            >
+
+            <label class="form-label">
+                РП ФИО
+            </label>
+
+            <input
+                type="text"
+                id="editRp"
+                placeholder="РП ФИО"
+            >
+
+            <label class="form-label">
+                Паспорт
+            </label>
+
+            <input
+                type="text"
+                id="editPassport"
+                placeholder="Серия и номер паспорта"
+            >
+
+            <label class="form-label">
+                Место проживания
+            </label>
+
+            <input
+                type="text"
+                id="editLocation"
+                placeholder="Место проживания"
+            >
+
+            <label class="form-label">
+                Статус
+            </label>
+
+            <select id="editStatus">
+
+                <option value="Активный">
+                    Активный
+                </option>
+
+                <option value="В розыске">
+                    В розыске
+                </option>
+
+                <option value="Под следствием">
+                    Под следствием
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn-gray"
+                onclick="closeEditModal()"
+            >
+                Отмена
+            </button>
+
+            <button
+                class="btn-green"
+                onclick="saveEditedRecord()"
+            >
+                Сохранить изменения
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+    "https://oftsbmvbntinjatbjnfi.supabase.co";
+
+const SUPABASE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mdHNibXZibnRpbmphdGJqbmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMDk0OTEsImV4cCI6MjEwNjU4NTQ5MX0.ZQuclb8ytFVXQXgi7Rc2x_xYpL4PSfGEgl3YXtCFkoc";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =========================================================
+   РОЛИ
+========================================================= */
+
+const ROLE_NAMES = {
+
+    reader: "Читатель",
+
+    admin: "Администратор",
+
+    sysadmin: "Системный администратор"
+
+};
+
+
+/* =========================================================
+   СОСТОЯНИЕ
+========================================================= */
+
+let db = [];
+
+let currentUser = null;
+
+let editingRecordId = null;
+
+
+/* =========================================================
+   ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ
+========================================================= */
+
+function usernameToEmail(username) {
+
+    return (
+        username
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, "")
+        + "@gmail.com"
+    );
+
+}
+
+
+/* =========================================================
+   ПОЛУЧЕНИЕ ТЕКУЩЕГО ПРОФИЛЯ
+========================================================= */
+
+async function loadCurrentProfile(user) {
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("profiles")
+        .select("id, username, role")
+        .eq("id", user.id)
+        .single();
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Профиль пользователя не найден в public.profiles."
+        );
+
+        await supabaseClient.auth.signOut();
+
+        return false;
+
+    }
+
+
+    currentUser = {
+
+        id: data.id,
+
+        username: data.username,
+
+        role: data.role
+
+    };
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   ЗАГРУЗКА ДОСЬЕ
+========================================================= */
+
+async function loadRecords() {
+
+    const container =
+        document.getElementById("cardsBox");
+
+
+    container.innerHTML =
+        '<div class="loading">Загрузка архива...</div>';
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("records")
+        .select("*")
+        .order("id", {
+            ascending: false
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            '<div class="empty">Ошибка загрузки архива.</div>';
+
+        alert(
+            "Не удалось загрузить записи: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    db = data || [];
+
+    renderList(db);
+
+}
+
+
+/* =========================================================
+   АВТОРИЗАЦИЯ
+========================================================= */
+
+async function login() {
+
+    const username =
+        document
+        .getElementById("loginUsername")
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById("loginPassword")
+        .value;
+
+
+    const errorBox =
+        document.getElementById("loginError");
+
+
+    errorBox.style.display = "none";
+
+
+    if (!username || !password) {
+
+        errorBox.textContent =
+            "Введите логин и пароль.";
+
+        errorBox.style.display = "block";
+
+        return;
+
+    }
+
+
+    const email =
+        usernameToEmail(username);
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient.auth
+        .signInWithPassword({
+
+            email: email,
+
+            password: password
+
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        errorBox.textContent =
+            "Неверный логин или пароль.";
+
+        errorBox.style.display = "block";
+
+        return;
+
+    }
+
+
+    if (!data.user) {
+
+        errorBox.textContent =
+            "Пользователь не найден.";
+
+        errorBox.style.display = "block";
+
+        return;
+
+    }
+
+
+    const profileLoaded =
+        await loadCurrentProfile(
+            data.user
+        );
+
+
+    if (!profileLoaded) {
+
+        return;
+
+    }
+
+
+    document
+        .getElementById("loginPage")
+        .style.display = "none";
+
+
+    document
+        .getElementById("app")
+        .style.display = "block";
+
+
+    updateInterface();
+
+    await loadRecords();
+
+}
+
+
+/* =========================================================
+   ПРОВЕРКА УЖЕ СУЩЕСТВУЮЩЕЙ СЕССИИ
+========================================================= */
+
+async function checkExistingSession() {
+
+    const {
+        data
+    } = await supabaseClient.auth
+        .getSession();
+
+
+    const session =
+        data.session;
+
+
+    if (!session) {
+
+        return;
+
+    }
+
+
+    const profileLoaded =
+        await loadCurrentProfile(
+            session.user
+        );
+
+
+    if (!profileLoaded) {
+
+        return;
+
+    }
+
+
+    document
+        .getElementById("loginPage")
+        .style.display = "none";
+
+
+    document
+        .getElementById("app")
+        .style.display = "block";
+
+
+    updateInterface();
+
+    await loadRecords();
+
+}
+
+
+/* =========================================================
+   ВЫХОД
+========================================================= */
+
+async function logout() {
+
+    closeEditModal();
+
+
+    await supabaseClient.auth.signOut();
+
+
+    currentUser = null;
+
+    db = [];
+
+
+    document
+        .getElementById("app")
+        .style.display = "none";
+
+
+    document
+        .getElementById("loginPage")
+        .style.display = "flex";
+
+
+    document
+        .getElementById("loginUsername")
+        .value = "";
+
+
+    document
+        .getElementById("loginPassword")
+        .value = "";
+
+
+    document
+        .getElementById("loginError")
+        .style.display = "none";
+
+}
+
+
+/* =========================================================
+   ИНТЕРФЕЙС
+========================================================= */
+
+function updateInterface() {
+
+    document
+        .getElementById("currentUsername")
+        .textContent =
+        currentUser.username;
+
+
+    document
+        .getElementById("currentRole")
+        .textContent =
+        ROLE_NAMES[currentUser.role];
+
+
+    const addBox =
+        document.getElementById("addRecordBox");
+
+
+    const accountsBox =
+        document.getElementById("accountsBox");
+
+
+    if (currentUser.role === "reader") {
+
+        addBox.classList.add("hidden");
+
+        accountsBox.classList.add("hidden");
+
+    }
+
+
+    if (currentUser.role === "admin") {
+
+        addBox.classList.remove("hidden");
+
+        accountsBox.classList.add("hidden");
+
+    }
+
+
+    if (currentUser.role === "sysadmin") {
+
+        addBox.classList.remove("hidden");
+
+        accountsBox.classList.remove("hidden");
+
+    }
+
+}
+
+
+/* =========================================================
+   ДОБАВЛЕНИЕ ДОСЬЕ
+========================================================= */
+
+async function addRecord() {
+    alert(
+    "UID текущего пользователя:\n" +
+    currentUser.id +
+    "\n\nРоль:\n" +
+    currentUser.role
+);
+
+    if (
+
+        currentUser.role !== "admin" &&
+
+        currentUser.role !== "sysadmin"
+
+    ) {
+
+        alert(
+            "У вас нет прав для добавления досье."
+        );
+
+        return;
+
+    }
+
+
+    const nick =
+        document
+        .getElementById("newNick")
+        .value
+        .trim();
+
+
+    const name =
+        document
+        .getElementById("newName")
+        .value
+        .trim();
+
+
+    const rp =
+        document
+        .getElementById("newRp")
+        .value
+        .trim();
+
+
+    const passport =
+        document
+        .getElementById("newPassport")
+        .value
+        .trim();
+
+
+    const residence =
+        document
+        .getElementById("newLoc")
+        .value
+        .trim();
+
+
+    const status =
+        document
+        .getElementById("newStatus")
+        .value;
+
+
+    if (!nick) {
+
+        alert(
+            "Roblox Username обязателен."
+        );
+
+        return;
+
+    }
+
+
+    if (!name) {
+
+        alert(
+            "Display Name обязателен."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("records")
+        .insert({
+
+            roblox_username: nick,
+
+            display_name: name,
+
+            rp_name: rp || null,
+
+            passport: passport || null,
+
+            residence: residence || null,
+
+            status: status,
+
+            created_by: currentUser.id
+
+        })
+        .select()
+        .single();
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Ошибка добавления: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    db.unshift(data);
+
+
+    document
+        .getElementById("newNick")
+        .value = "";
+
+
+    document
+        .getElementById("newName")
+        .value = "";
+
+
+    document
+        .getElementById("newRp")
+        .value = "";
+
+
+    document
+        .getElementById("newPassport")
+        .value = "";
+
+
+    document
+        .getElementById("newLoc")
+        .value = "";
+
+
+    document
+        .getElementById("newStatus")
+        .value = "Активный";
+
+
+    executeSearch();
+
+
+    alert(
+        "Досье успешно внесено в архив."
+    );
+
+}
+
+
+/* =========================================================
+   ОТОБРАЖЕНИЕ
+========================================================= */
+
+function renderList(items) {
+
+    const container =
+        document.getElementById("cardsBox");
+
+
+    container.innerHTML = "";
+
+
+    if (!items.length) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                СОВПАДЕНИЙ В АРХИВЕ НЕ ОБНАРУЖЕНО
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    items.forEach(function(item) {
+
+
+        let statusClass =
+            "status-active";
+
+
+        if (
+            item.status === "В розыске"
+        ) {
+
+            statusClass =
+                "status-wanted";
+
+        }
+
+
+        if (
+            item.status === "Под следствием"
+        ) {
+
+            statusClass =
+                "status-investigation";
+
+        }
+
+
+        let actions = "";
+
+
+        if (
+
+            currentUser.role === "admin" ||
+
+            currentUser.role === "sysadmin"
+
+        ) {
+
+            actions = `
+
+    <div class="card-actions">
+
+        <button
+            class="btn-gray"
+            onclick="openEditModal(${item.id})"
+        >
+            Редактировать
+        </button>
+
+        <button
+            class="btn-red"
+            onclick="deleteRecord(${item.id})"
+        >
+            Удалить досье
+        </button>
+
+    </div>
+
+`;
+
+        }
+
+
+        container.innerHTML += `
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <span class="card-header-title">
+                        ДАННЫЕ ЛИЦА
+                    </span>
+
+                    <span class="card-number">
+                        ДЕЛО № ${escapeHTML(item.id)}
+                    </span>
+
+                </div>
+
+                <div class="card-row">
+
+                    <b>
+                        Roblox Username:
+                    </b>
+
+                    <span
+                        class="card-row-value username-value"
+                    >
+                        ${escapeHTML(
+                            item.roblox_username || "Не указан"
+                        )}
+                    </span>
+
+                </div>
+
+                <div class="card-row">
+
+                    <b>
+                        Display Name:
+                    </b>
+
+                    <span
+                        class="card-row-value display-value"
+                    >
+                        ${escapeHTML(
+                            item.display_name || "Не указан"
+                        )}
+                    </span>
+
+                </div>
+
+                <div class="card-row">
+
+                    <b>
+                        РП ФИО:
+                    </b>
+
+                    <span class="card-row-value">
+
+                        ${escapeHTML(
+                            item.rp_name || "Не указано"
+                        )}
+
+                    </span>
+
+                </div>
+
+                <div class="card-row">
+
+                    <b>
+                        Паспорт:
+                    </b>
+
+                    <span class="card-row-value">
+
+                        ${escapeHTML(
+                            item.passport || "Не указан"
+                        )}
+
+                    </span>
+
+                </div>
+
+                <div class="card-row">
+
+                    <b>
+                        Место проживания:
+                    </b>
+
+                    <span class="card-row-value">
+
+                        ${escapeHTML(
+                            item.residence || "Не указано"
+                        )}
+
+                    </span>
+
+                </div>
+
+                <div class="card-row">
+
+                    <b>
+                        Статус:
+                    </b>
+
+                    <span
+                        class="status ${statusClass}"
+                    >
+
+                        ${escapeHTML(
+                            item.status
+                        )}
+
+                    </span>
+
+                </div>
+
+                ${actions}
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================================================
+   РЕДАКТИРОВАНИЕ
+========================================================= */
+
+function openEditModal(id) {
+
+    if (
+
+        currentUser.role !== "admin" &&
+
+        currentUser.role !== "sysadmin"
+
+    ) {
+
+        return;
+
+    }
+
+
+    const item =
+        db.find(function(record) {
+
+            return Number(record.id) === Number(id);
+
+        });
+
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    editingRecordId =
+        item.id;
+
+
+    document
+        .getElementById("editNick")
+        .value =
+        item.roblox_username || "";
+
+
+    document
+        .getElementById("editName")
+        .value =
+        item.display_name || "";
+
+
+    document
+        .getElementById("editRp")
+        .value =
+        item.rp_name || "";
+
+
+    document
+        .getElementById("editPassport")
+        .value =
+        item.passport || "";
+
+
+    document
+        .getElementById("editLocation")
+        .value =
+        item.residence || "";
+
+
+    document
+        .getElementById("editStatus")
+        .value =
+        item.status || "Активный";
+
+
+    document
+        .getElementById("editModal")
+        .classList.add("active");
+
+}
+
+
+/* =========================================================
+   СОХРАНЕНИЕ РЕДАКТИРОВАНИЯ
+========================================================= */
+
+async function saveEditedRecord() {
+
+    if (editingRecordId === null) {
+
+        return;
+
+    }
+
+
+    const nick =
+        document
+        .getElementById("editNick")
+        .value
+        .trim();
+
+
+    const name =
+        document
+        .getElementById("editName")
+        .value
+        .trim();
+
+
+    const rp =
+        document
+        .getElementById("editRp")
+        .value
+        .trim();
+
+
+    const passport =
+        document
+        .getElementById("editPassport")
+        .value
+        .trim();
+
+
+    const residence =
+        document
+        .getElementById("editLocation")
+        .value
+        .trim();
+
+
+    const status =
+        document
+        .getElementById("editStatus")
+        .value;
+
+
+    if (!nick) {
+
+        alert(
+            "Roblox Username обязателен."
+        );
+
+        return;
+
+    }
+
+
+    if (!name) {
+
+        alert(
+            "Display Name обязателен."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("records")
+        .update({
+
+            roblox_username: nick,
+
+            display_name: name,
+
+            rp_name: rp || null,
+
+            passport: passport || null,
+
+            residence: residence || null,
+
+            status: status
+
+        })
+        .eq("id", editingRecordId)
+        .select()
+        .single();
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Ошибка сохранения: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    const index =
+        db.findIndex(function(record) {
+
+            return Number(record.id) ===
+                   Number(editingRecordId);
+
+        });
+
+
+    if (index !== -1) {
+
+        db[index] = data;
+
+    }
+
+
+    closeEditModal();
+
+    executeSearch();
+
+
+    alert(
+        "Досье успешно обновлено."
+    );
+
+}
+/* =========================================================
+   УДАЛЕНИЕ ДОСЬЕ
+========================================================= */
+
+async function deleteRecord(id) {
+
+    if (
+        currentUser.role !== "admin" &&
+        currentUser.role !== "sysadmin"
+    ) {
+        alert("У вас нет прав на удаление досье.");
+        return;
+    }
+
+    const item = db.find(function(record) {
+        return Number(record.id) === Number(id);
+    });
+
+    if (!item) {
+        alert("Досье не найдено.");
+        return;
+    }
+
+    const confirmed = confirm(
+        "Вы действительно хотите удалить досье № " +
+        id +
+        "?\n\n" +
+        "Roblox Username: " +
+        (item.roblox_username || "Не указан") +
+        "\n\n" +
+        "Это действие нельзя отменить."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const {
+        error
+    } = await supabaseClient
+        .from("records")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Ошибка удаления: " +
+            error.message
+        );
+
+        return;
+    }
+
+    db = db.filter(function(record) {
+        return Number(record.id) !== Number(id);
+    });
+
+    executeSearch();
+
+    alert("Досье успешно удалено.");
+}
+
+
+/* =========================================================
+   ЗАКРЫТИЕ МОДАЛЬНОГО ОКНА
+========================================================= */
+
+function closeEditModal() {
+
+    document
+        .getElementById("editModal")
+        .classList.remove("active");
+
+
+    editingRecordId = null;
+
+}
+
+
+/* =========================================================
+   ПОИСК
+========================================================= */
+
+function executeSearch() {
+
+    const text =
+        document
+        .getElementById("searchQuery")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    const selectedStatus =
+        document
+        .getElementById("statusFilter")
+        .value;
+
+
+    const filtered =
+        db.filter(function(item) {
+
+
+            const searchableText = (
+
+                (item.roblox_username || "") + " " +
+
+                (item.display_name || "") + " " +
+
+                (item.rp_name || "") + " " +
+
+                (item.passport || "") + " " +
+
+                (item.residence || "") + " " +
+
+                (item.status || "")
+
+            ).toLowerCase();
+
+
+            const textMatches =
+                searchableText.includes(text);
+
+
+            const statusMatches =
+                !selectedStatus ||
+                item.status === selectedStatus;
+
+
+            return (
+                textMatches &&
+                statusMatches
+            );
+
+        });
+
+
+    renderList(filtered);
+
+}
+
+
+/* =========================================================
+   ЗАЩИТА HTML
+========================================================= */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================================================
+   ENTER НА ВХОДЕ
+========================================================= */
+
+document
+    .getElementById("loginPassword")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                login();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   ЗАКРЫТИЕ МОДАЛЬНОГО ОКНА
+========================================================= */
+
+document
+    .getElementById("editModal")
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target ===
+                document.getElementById("editModal")
+            ) {
+
+                closeEditModal();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   ЗАПУСК
+========================================================= */
+
+checkExistingSession();
+
+</script>
+
+</body>
+
+</html>
